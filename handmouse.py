@@ -77,21 +77,9 @@ while cv2.getWindowProperty(hand_tracker.window_name, 0) >= 0:
 
         if length < 40:
             cv2.circle(img, (line_info[4], line_info[5]), 15, (0, 255, 0), cv2.FILLED)
+
             mouse.press(Button.left)
+            time.sleep(0.1)
             mouse.release(Button.left)
 
     finish_loop()
-"""
-    # 8. Both Index and middle fingers are up : Clicking Mode
-    
-    
-    # 11. Frame Rate
-    cTime = time.time()
-    fps = 1 / (cTime - pTime)
-    pTime = cTime
-    cv2.putText(img, str(int(fps)), (20, 50), cv2.FONT_HERSHEY_PLAIN, 3,
-    (255, 0, 0), 3)
-    # 12. Display
-    cv2.imshow("Image", img)
-    cv2.waitKey(1)
-"""
