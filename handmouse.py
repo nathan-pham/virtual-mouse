@@ -72,14 +72,21 @@ while cv2.getWindowProperty(hand_tracker.window_name, 0) >= 0:
 
         ploc_x, ploc_y = cloc_x, cloc_y
 
-    if fingers[1] == 1 and fingers[2] == 1:
-        length, line_info = hand_tracker.distance(landmark_list[8], landmark_list[12], img)
+    # if fingers[1] == 1 and fingers[2] == 1:
+    #     length, line_info = hand_tracker.distance(landmark_list[8], landmark_list[12], img)
 
-        if length < 40:
-            cv2.circle(img, (line_info[4], line_info[5]), 15, (0, 255, 0), cv2.FILLED)
+    #     if length < 40:
+    #         cv2.circle(img, (line_info[4], line_info[5]), 15, (0, 255, 0), cv2.FILLED)
 
-            mouse.press(Button.left)
-            time.sleep(0.1)
-            mouse.release(Button.left)
+    #         mouse.press(Button.left)
+    #         time.sleep(0.1)
+    #         mouse.release(Button.left)
+    length, line_info = hand_tracker.distance(landmark_list[4], landmark_list[8], img)
+
+    if length < 40:
+        cv2.circle(img, (line_info[4], line_info[5]), 15, (0, 255, 0), cv2.FILLED)
+        mouse.press(Button.left)
+        time.sleep(0.1)
+        mouse.release(Button.left)
 
     finish_loop()
