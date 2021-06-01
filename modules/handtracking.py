@@ -74,7 +74,7 @@ class HandTracker():
             cv2.circle(img, (x2, y2), 10, (255, 0, 255), cv2.FILLED)
             cv2.circle(img, (cx, cy), 10, (0, 0, 255), cv2.FILLED)
         
-        return length, img, [x1, y1, x2, y2, cx, cy]
+        return length, [x1, y1, x2, y2, cx, cy]
 
 def main():
     hand_tracker = HandTracker()

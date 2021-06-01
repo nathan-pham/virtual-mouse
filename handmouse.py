@@ -72,23 +72,18 @@ while cv2.getWindowProperty(hand_tracker.window_name, 0) >= 0:
 
         ploc_x, ploc_y = cloc_x, cloc_y
 
+    if fingers[1] == 1 and fingers[2] == 1:
+        length, line_info = hand_tracker.distance(landmark_list[8], landmark_list[12], img)
+
+        if length < 40:
+            cv2.circle(img, (line_info[4], line_info[5]), 15, (0, 255, 0), cv2.FILLED)
+            mouse.press(Button.left)
+            mouse.release(Button.left)
+
     finish_loop()
 """
-        # 7. Move Mouse
-        autopy.mouse.move(wScr - clocX, clocY)
-        cv2.circle(img, (x1, y1), 15, (255, 0, 255), cv2.FILLED)
-        plocX, plocY = clocX, clocY
-        
     # 8. Both Index and middle fingers are up : Clicking Mode
-    if fingers[1] == 1 and fingers[2] == 1:
-        # 9. Find distance between fingers
-        length, img, lineInfo = detector.findDistance(8, 12, img)
-        print(length)
-        # 10. Click mouse if distance short
-        if length < 40:
-            cv2.circle(img, (lineInfo[4], lineInfo[5]),
-            15, (0, 255, 0), cv2.FILLED)
-            autopy.mouse.click()
+    
     
     # 11. Frame Rate
     cTime = time.time()
