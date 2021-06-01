@@ -7,6 +7,9 @@ import cv2
 from modules.handtracking import HandTracker 
 import time
 
+hand_tracker = HandTracker()
+mouse = Controller()
+
 camera_width, camera_height = 640, 480
 frame_reduction = 100
 smoothing = 7
@@ -14,61 +17,63 @@ smoothing = 7
 previous_time = 0
 current_time = 0
 
-plocX, plocY = 0, 0
-clocX, clocY = 0, 0
+ploc_x, ploc_y = 0, 0
+cloc_x, cloc_x = 0, 0
+
+hand_tracker.create_window()
 
 capture = cv2.VideoCapture(0)
 capture.set(3, camera_width)
 capture.set(4, camera_height)
 
-hand_tracker = HandTracker()
-
 monitor = get_monitors()[0]
 screen_width, screen_height = monitor.width, monitor.height
 
-hand_tracker.create_window()
-
 while cv2.getWindowProperty(hand_tracker.window_name, 0) >= 0:
     success, img = hand_tracker.capture.read()
-    
+
     current_time = time.time()
     fps = int(1 / (current_time - previous_time))
     previous_time = current_time
     
-    hands = hand_tracker.find_hands(img, True, fps)
-    
-    if len(hands) > 0:
-        landmark_list, bounding_box = hand_tracker.find_position(img, hands[0])
+    def finish_loop():
+        flipped_img = cv2.flip(img, 1)
+        cv2.putText(flipped_img, "fps: " + str(int(fps)), (10, 20), cv2.FONT_HERSHEY_PLAIN, 1, (255, 0, 255), 1)
+        cv2.imshow(hand_tracker.window_name, flipped_img)
+        cv2.waitKey(50)
 
-    cv2.imshow(hand_tracker.window_name, img)
-    cv2.waitKey(50)
-
-"""
-while True:
-    # 1. Find hand Landmarks
-    success, img = cap.read()
-    img = detector.findHands(img)
-    lmList, bbox = detector.findPosition(img)
-    # 2. Get the tip of the index and middle fingers
-    if len(lmList) != 0:
-        x1, y1 = lmList[8][1:]
-        x2, y2 = lmList[12][1:]
-        # print(x1, y1, x2, y2)
+    hands = hand_tracker.find_hands(img, True)
     
-    # 3. Check which fingers are up
-    fingers = detector.fingersUp()
-    # print(fingers)
-    cv2.rectangle(img, (frameR, frameR), (wCam - frameR, hCam - frameR),
-    (255, 0, 255), 2)
-    # 4. Only Index Finger : Moving Mode
+    cv2.rectangle(img, (frame_reduction, frame_reduction), (camera_width - frame_reduction, camera_height - frame_reduction), (255, 0, 255), 2)
+    
+    if not len(hands) > 0:
+        finish_loop()
+        continue
+
+    landmark_list, bounding_box = hand_tracker.find_position(img, hands[0])
+
+    if not len(landmark_list) > 0:
+        finish_loop()
+        continue
+
+    x1, y1 = landmark_list[8][1:]
+    x2, y2 = landmark_list[12][1:]
+    fingers = hand_tracker.fingers_up(landmark_list)
+
     if fingers[1] == 1 and fingers[2] == 0:
-        # 5. Convert Coordinates
-        x3 = np.interp(x1, (frameR, wCam - frameR), (0, wScr))
-        y3 = np.interp(y1, (frameR, hCam - frameR), (0, hScr))
-        # 6. Smoothen Values
-        clocX = plocX + (x3 - plocX) / smoothening
-        clocY = plocY + (y3 - plocY) / smoothening
-    
+        x3 = np.interp(x1, (frame_reduction, camera_width - frame_reduction), (0, screen_width))
+        y3 = np.interp(y1, (frame_reduction, camera_height - frame_reduction), (0, screen_height))
+
+        cloc_x = ploc_x + (x3 - ploc_x) / smoothing
+        cloc_y = ploc_y + (y3 - ploc_y) / smoothing
+        
+        cv2.circle(img, (x1, y1), 15, (255, 0, 255), cv2.FILLED)
+        mouse.position = (screen_width - cloc_x, cloc_y)
+
+        ploc_x, ploc_y = cloc_x, cloc_y
+
+    finish_loop()
+"""
         # 7. Move Mouse
         autopy.mouse.move(wScr - clocX, clocY)
         cv2.circle(img, (x1, y1), 15, (255, 0, 255), cv2.FILLED)
