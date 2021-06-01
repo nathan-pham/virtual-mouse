@@ -95,7 +95,7 @@ def main():
         hands = hand_tracker.find_hands(img, True, fps)
         
         if len(hands) > 0:
-            landmark_list = hand_tracker.find_position(img, hands[0])
+            landmark_list, bounding_box = hand_tracker.find_position(img, hands[0])
 
         cv2.imshow(hand_tracker.window_name, img)
         cv2.waitKey(50)
